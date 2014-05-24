@@ -7,6 +7,7 @@ $(document).ready(function(){
 		$(".firstStep").hide();
 		$(".secondStep").show();
 		$("#recordBtn").show();
+		$("#inputFatherName").focus();
 	});
 
 	$("#recordBtn").click(function(){
@@ -27,9 +28,15 @@ $(document).ready(function(){
 			baptismDay: 		$("#baptismDay").val(),
 			baptismYear: 		$("#baptismYear").val()
 		};
-
+		alert(userInputForReg);
 		$.post("php/insertNewChristian.php", userInputForReg, function(json){
-			alert("Data: " + json);
+			console.log(json);
+			if(json.queryStatus == "success"){
+				alert("Data: " + json.childLName  + " " + json.childFName);				
+			}
+			else{
+				alert("Failed");
+			}
 		});
 	});
 });

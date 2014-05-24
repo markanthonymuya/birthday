@@ -25,17 +25,19 @@
     $newRecordDetails = mysqli_query($con, "INSERT INTO details (fatherName, motherName, emailAddress, homeAddress, ministerName, baptismMonth, baptismDay, baptismYear) VALUES ('$fatherName', '$motherName', '$emailAddress', '$homeAddress', '$ministerName', '$baptismMonth', '$baptismDay', '$baptismYear')");
 
     $newRecordJson = array();
+    $newRecordJson['queryStatus'] = "fail";
 
     if(!$newRecordChristian || !$newRecordDetails){
-        die('Invalid query: ' . mysqli_error());
+        $newRecordJson['queryStatus'] = "fail";        
     }
     else{
-        $christianQuery = mysqli_query($con, "SELECT * FROM christians WHERE childLName = '$childLName', childFName = '$childFName', childMName = '$childMName', childBday='$childBday'");
+        $christianQuery = mysqli_query($con, "SELECT * FROM christians WHERE childLName = '$childLName' AND childFName = '$childFName'AND childMName = '$childMName'");
         while($row = mysqli_fetch_array($christianQuery)){
             $newRecordJson['childLName'] = $row['childLName'];
             $newRecordJson['childFName'] = $row['childFName'];
             $newRecordJson['childMName'] = $row['childMName'];
-        }         
+        }
+        $newRecordJson['queryStatus'] = "success";         
     }
 
     header("Content-type:application/json");
