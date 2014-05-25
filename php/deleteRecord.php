@@ -8,13 +8,20 @@
     $bdayDay = $_POST['bdayDay'];
     $bdayYear = $_POST['bdayYear'];
 
+    // $childLName = $_GET['inputLastName'];
+    // $childFName = $_GET['inputFirstName'];
+    // $childMName = $_GET['inputMiddleName'];
+    // $bdayMonth = $_GET['bdayMonth'];
+    // $bdayDay = $_GET['bdayDay'];
+    // $bdayYear = $_GET['bdayYear'];
+
     $deletedRecordJson = array();
     $deletedRecordJson['queryStatus'] = "fail";
 
     $queryId = mysqli_query($con, "SELECT id, childLName, childFName, childMName FROM christians WHERE childLName='$childLName' AND childFName='$childFName' AND childMName='$childMName' AND bdayMonth='$bdayMonth' AND bdayDay='$bdayDay' AND bdayYear='$bdayYear'");
     
-    if(mysqli_num_rows($resultOwnerSearch) == 1){
-        $row = mysqli_fetch_array($christianQuery);
+    if(mysqli_num_rows($queryId) == 1){
+        $row = mysqli_fetch_array($queryId);
         $deletedRecordJson['childLName'] = $row['childLName'];
         $deletedRecordJson['childFName'] = $row['childFName'];
         $deletedRecordJson['childMName'] = $row['childMName'];

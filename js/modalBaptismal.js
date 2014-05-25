@@ -1,9 +1,10 @@
+var userFormInput = {};
+
 $(document).ready(function(){
 	$(".secondStep").hide();
 	$("#recordBtn").hide();
 	$("#backBtn").hide();
 	$("#searchBtn").hide();
-	var userFormInput = {};
 
 	$("#nextBtn").click(function(){
 		$("#backBtn").show();
@@ -48,19 +49,66 @@ $(document).ready(function(){
 
 	$("#searchBtn").click(function(){
 		getUserSearchFormInput();
-		console.log("userInput: ");
-		console.log(userFormInput);
+		
+		$("#searchResults").remove();
 		$.post("php/searchRecord.php", userFormInput, function(json){
 			console.log(json);
 			if(json.queryStatus == "success"){
-				alert("Successfully Search: " + json.childLName  + ", " + json.childFName + " " + json.childMName);
-				$('#myModal').modal('hide');
+				$(".firstStep").hide();
+				$("#modalBody").prepend('<div id="searchResults"></div>');
+				for(var i = 1; i <= json.counter; i++){
+					var jsonIdNumber = json['idNumber'+i];
+					var stringSettings = '<button id="deleteBtn'+i+'" userId="'+jsonIdNumber+'" data-rf="'+i+'" class="btn btn-default pull-right deleteBtn" style="margin-left: 5px;"><span class="glyphicon glyphicon-remove"></span></button><button id="editBtn'+i+'" userId="'+jsonIdNumber+'" class="btn btn-default pull-right editBtn"><span class="glyphicon glyphicon-pencil"></span></button></span>';
+					$("#searchResults").append('<p class="appendedSearch" id="appended'+i+'"><span data-rf="'+i+'" id="resultChristian'+i+'">'+json['childLName'+jsonIdNumber]+', '+json['childFName'+jsonIdNumber]+' '+json['childMName'+jsonIdNumber]+'<button id="confirmedDeleteBtn'+i+'" style="margin-left: 5px;" class="btn btn-danger pull-right confirmedDeleteBtn">Delete</button>'+stringSettings+'</p><br class="resultBreak" />');
+					$("#confirmedDeleteBtn"+i).hide();
+				}
+
+				$(".deleteBtn").click(function(){
+					console.log("deleteBtn");
+					var parentId = this.parentNode.getAttribute('data-rf');
+					$(".confirmedDeleteBtn").hide();
+					$("#deleteBtn" + parentId).hide();
+					$("#confirmedDeleteBtn"+parentId).show("slow");
+				});
+
+				$(".confirmedDeleteBtn").click(function(){
+					var parentId = this.parentNode.getAttribute('data-rf');
+					$(".confirmedDeleteBtn").hide();
+					$(".deleteBtn").show();
+					$("#confirmedDeleteBtn"+parentId).show();
+					$("#deleteBtn"+parentId).hide();
+
+					var jsonIdNumber = this.parentNode.getAttribute('userId');
+
+					var deleteFromDB = 	{
+											inputLastName: json['childLName'+jsonIdNumber],
+											inputFirstName: json['childFName'+jsonIdNumber],
+											inputMiddleName: json['childMName'+jsonIdNumber],
+											bdayMonth: json['bdayMonth'+jsonIdNumber],
+											bdayDay: json['bdayDay'+jsonIdNumber],
+											bdayYear: json['bdayYear'+jsonIdNumber]
+										};
+					console.log(deleteFromDB);
+					$.post("php/deleteRecord.php", deleteFromDB, function(json){
+						console.log(json);
+						if(json.queryStatus == "success"){
+							alert("Successfully Deleted: " + json.childLName  + ", " + json.childFName + " " + json.childMName);
+							$("#appended" + parentId).remove();
+						}
+						else{
+							alert("Failed to Delete Record. Please try again later.");
+						}
+					});
+					console.log("confirmedDeleteBtn");		
+				});
+
 			}
 			else{
 				alert("Failed to Search A Record. Please try again later.");
 			}
 		});
 	});
+
 
 	//////////FUNCTIONS//////////
 
@@ -130,5 +178,6 @@ $(document).ready(function(){
 	$('#myModal').on('hidden.bs.modal', function (e) {
 		resetRegForm();
 		userFormInput = {};
+		$("#searchResults").remove();
 	});
 });
