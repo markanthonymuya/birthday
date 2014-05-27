@@ -16,6 +16,8 @@
     $baptismMonth = $_POST['baptismMonth'];
     $baptismDay = $_POST['baptismDay'];
     $baptismYear = $_POST['baptismYear'];
+
+    
  
     date_default_timezone_set("Asia/Manila");
     $dateAdded = date("Y/m/d");

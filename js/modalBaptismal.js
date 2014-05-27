@@ -2,26 +2,49 @@ var userFormInput = {};
 
 $(document).ready(function(){
 	$(".secondStep").hide();
+	$(".thirdStep").hide();
+	$("#backBtn2").hide();
+	$("#backBtn3").hide();
+	$("#nextBtn2").hide();
 	$("#recordBtn").hide();
-	$("#backBtn").hide();
 	$("#searchBtn").hide();
 
-	$("#nextBtn").click(function(){
-		$("#backBtn").show();
-		$("#nextBtn").hide();
+	$("#nextBtn1").click(function(){
+		$("#backBtn2").show();
+		$("#nextBtn2").show();
+		$("#nextBtn1").hide();
 		$(".firstStep").hide();
 		$(".secondStep").show();
-		$("#recordBtn").show();
 		$("#inputFatherName").focus();
 	});
 
-	$("#backBtn").click(function(){
-		$("#backBtn").hide();
-		$("#nextBtn").show();
+	$("#nextBtn2").click(function(){
+		$("#backBtn2").hide();
+		$("#nextBtn2").hide();
+		$("#backBtn3").show();
+		$(".secondStep").hide();
+		$(".thirdStep").show();
+		$("#recordBtn").show();
+		$("#inputMinisterName").focus();
+	});
+
+	$("#backBtn2").click(function(){
+		$("#backBtn2").hide();
+		$("#nextBtn1").show();
+		$("#nextBtn2").hide();
 		$(".firstStep").show();
 		$(".secondStep").hide();
-		$("#recordBtn").hide();
 		$("#inputLastName").focus();
+	});
+
+	$("#backBtn3").click(function(){
+		$("#backBtn3").hide();
+		$("#backBtn2").show();
+		$("#nextBtn2").show();
+		$(".secondStep").show();
+		$(".thirdStep").hide();
+		$("#recordBtn").hide();
+		$("#inputFatherName").focus();
 	});
 
 	$("#recordBtn").click(function(){
@@ -121,21 +144,31 @@ $(document).ready(function(){
 		$("#bdayYear").val("");
 		//////////////////////////////////
 		$("#inputFatherName").val("");
+		$("#inputFatherBirthPlace").val("");
 		$("#inputMotherName").val("");
+		$("#inputMotherBirthPlace").val("");
 		$("#inputEmailAddress").val("");
 		$("#inputHomeAddress").val("");
+		///////////////////////////////
 		$("#inputMinisterName").val("");
 		$("#baptismMonth").val("");
 		$("#baptismDay").val("");
 		$("#baptismYear").val("");
+		$("#inputGodfatherName").val("");
+		$("#inputGodfatherAddress").val("");
+		$("#inputGodmotherName").val("");
+		$("#inputGodmotherAddress").val("");
 	};
 
 	var resetRegForm = function(){
 		$("#myModalLabel").text("New Christian");
-		$("#backBtn").hide();
-		$("#nextBtn").show();
+		$("#nextBtn1").show();
+		$("#backBtn2").hide();
+		$("#nextBtn2").show();
+		$("#backBtn3").hide();
 		$(".firstStep").show();
 		$(".secondStep").hide();
+		$(".thirdStep").hide();
 		$("#recordBtn").hide();
 		$("#searchBtn").hide();
 		clearAllRegFormInput();
@@ -151,13 +184,21 @@ $(document).ready(function(){
 			bdayYear: 			$("#bdayYear").val(),
 			////////////////////////////////////////////////
 			inputFatherName: 	$("#inputFatherName").val(),
+			inputFatherBirthPlace: $("#inputFatherBirthPlace").val(),
 			inputMotherName: 	$("#inputMotherName").val(),
+			inputMotherBirthPlace: $("#inputGodmotherAddress").val(),
 			inputEmailAddress: 	$("#inputEmailAddress").val(),
 			inputHomeAddress: 	$("#inputHomeAddress").val(),
+			///////////////////////////////////////////////
 			inputMinisterName: 	$("#inputMinisterName").val(),
 			baptismMonth: 		$("#baptismMonth").val(),
 			baptismDay: 		$("#baptismDay").val(),
-			baptismYear: 		$("#baptismYear").val()
+			baptismYear: 		$("#baptismYear").val(),
+			baptismYear: 		$("#baptismYear").val(),
+			inputGodfatherName: $("#inputGodfatherName").val(),
+			inputGodfatherAddress: $("#inputGodfatherAddress").val(),
+			inputGodmotherName: $("#inputGodmotherName").val(),
+			inputGodmotherAddress: $("#inputGodmotherAddress").val()
 		};
 	};
 
