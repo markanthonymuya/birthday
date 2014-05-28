@@ -1,6 +1,7 @@
-var userFormInput = {};
-
 $(document).ready(function(){
+
+	var userFormInput = {};
+
 	$(".secondStep").hide();
 	$(".thirdStep").hide();
 	$("#backBtn2").hide();
@@ -8,27 +9,54 @@ $(document).ready(function(){
 	$("#nextBtn2").hide();
 	$("#recordBtn").hide();
 	$("#searchBtn").hide();
+	$("#registerNewBtn").hide();
+
 
 	$("#nextBtn1").click(function(){
-		$("#backBtn2").show();
-		$("#nextBtn2").show();
-		$("#nextBtn1").hide();
-		$(".firstStep").hide();
-		$(".secondStep").show();
-		$("#inputFatherName").focus();
+		if($("#inputLastName").val() != "" && $("#inputFirstName").val() != "" && $("#bdayMonth").val() != "" && $("#bdayDay").val() != "" && $("#bdayYear").val() != ""){
+			$("#backBtn2").show();
+			$("#nextBtn2").show();
+			$("#nextBtn1").hide();
+			$(".firstStep").hide();
+			$(".secondStep").show();
+			$("#inputFatherName").focus();
+			getUserRegFormInput();
+			$("#myModalLabel").text(userFormInput.inputLastName +", "+ userFormInput.inputFirstName +" "+ userFormInput.inputMiddleName);
+			$("#statusPerProcess").text("");
+		}
+		else{
+			$("#statusPerProcess").text("Please complete required fields.");
+			$("#statusPerProcess").attr("style", "color:red");
+
+			$("input").click(function(){
+				$("#statusPerProcess").hide();
+			});
+		}
 	});
 
 	$("#nextBtn2").click(function(){
-		$("#backBtn2").hide();
-		$("#nextBtn2").hide();
-		$("#backBtn3").show();
-		$(".secondStep").hide();
-		$(".thirdStep").show();
-		$("#recordBtn").show();
-		$("#inputMinisterName").focus();
+		if($("#inputFatherName").val() != "" && $("#inputMotherName").val() != "" && $("#inputHomeAddress").val() != ""){
+			$("#backBtn2").hide();
+			$("#nextBtn2").hide();
+			$("#backBtn3").show();
+			$(".secondStep").hide();
+			$(".thirdStep").show();
+			$("#recordBtn").show();
+			$("#inputMinisterName").focus();
+			$("#inputMinisterName").val("Rev. Fr. ");
+		}
+		else{
+			$("#statusPerProcess").text("Please complete required fields.");
+			$("#statusPerProcess").attr("style", "color:red");
+
+			$("input").click(function(){
+				$("#statusPerProcess").hide();
+			});
+		}
 	});
 
 	$("#backBtn2").click(function(){
+		$("#myModalLabel").text("New Christian");
 		$("#backBtn2").hide();
 		$("#nextBtn1").show();
 		$("#nextBtn2").hide();
@@ -48,18 +76,36 @@ $(document).ready(function(){
 	});
 
 	$("#recordBtn").click(function(){
-		getUserRegFormInput();
-		
-		$.post("php/insertNewRecord.php", userFormInput, function(json){
-			console.log(json);
-			if(json.queryStatus == "success"){
-				alert("Successfully Recorded: " + json.childLName  + ", " + json.childFName + " " + json.childMName);
-				$('#myModal').modal('hide');
-			}
-			else{
-				alert("Failed to Record New Registrant. Please try again later.");
-			}
-		});
+		if($("#inputMinisterName").val() != "" && $("#inputGodfatherName").val() != "" && $("#inputGodmotherName").val() != "" && $("#baptismMonth").val() != "" && $("#baptismDay").val() != "" && $("#baptismYear").val() != "" && $("#inputBaptismRegNum").val() != "" && $("#inputBaptismPageNum").val() != "" && $("#inputBaptismBookNum").val() != ""){
+			getUserRegFormInput();
+			$("#recordBtn").attr("disabled","disabled");
+			$.post("php/insertNewRecord.php", userFormInput, function(json){
+				console.log(json);
+				if(json.queryStatus == "success"){
+					$("#registerNewBtn").show();
+					$("#recordBtn").hide();
+					$("#statusPerProcess").text("Successfully Recorded: " + json.childLName  + ", " + json.childFName + " " + json.childMName);
+					$("#statusPerProcess").attr("style", "color:green");
+					$("#backBtn3").hide();
+				}
+				else{
+					alert("Failed to Record New Registrant. Please try again later.");
+					$("#recordBtn").removeAttr("disabled");
+				}
+			});
+		}
+		else{
+			$("#statusPerProcess").text("Please complete required fields.");
+			$("#statusPerProcess").attr("style", "color:red");
+
+			$("input").click(function(){
+				$("#statusPerProcess").hide();
+			});
+		}
+	});
+
+	$("#registerNewBtn").click(function(){
+		resetRegForm();
 	});
 
 	$("#searchRecord").click(function(){
@@ -67,7 +113,6 @@ $(document).ready(function(){
 		$("#nextBtn").hide();
 		$("#searchBtn").show();
 		$(".firstStep").show();
-		$("#inputLastName").focus();
 	});
 
 	$("#searchBtn").click(function(){
@@ -144,34 +189,40 @@ $(document).ready(function(){
 		$("#bdayYear").val("");
 		//////////////////////////////////
 		$("#inputFatherName").val("");
-		$("#inputFatherBirthPlace").val("");
+		//$("#inputFatherBirthPlace").val("");
 		$("#inputMotherName").val("");
-		$("#inputMotherBirthPlace").val("");
+		//$("#inputMotherBirthPlace").val("");
 		$("#inputEmailAddress").val("");
 		$("#inputHomeAddress").val("");
 		///////////////////////////////
 		$("#inputMinisterName").val("");
+		$("#inputGodfatherName").val("");
+		//$("#inputGodfatherAddress").val("");
+		$("#inputGodmotherName").val("");
+		//$("#inputGodmotherAddress").val("");
 		$("#baptismMonth").val("");
 		$("#baptismDay").val("");
 		$("#baptismYear").val("");
-		$("#inputGodfatherName").val("");
-		$("#inputGodfatherAddress").val("");
-		$("#inputGodmotherName").val("");
-		$("#inputGodmotherAddress").val("");
+		$("#inputBaptismRegNum").val("");
+		$("#inputBaptismPageNum").val("");
+		$("#inputBaptismBookNum").val("");
 	};
 
 	var resetRegForm = function(){
 		$("#myModalLabel").text("New Christian");
 		$("#nextBtn1").show();
-		$("#backBtn2").hide();
-		$("#nextBtn2").show();
-		$("#backBtn3").hide();
 		$(".firstStep").show();
+		$("#backBtn2").hide();
+		$("#nextBtn2").hide();
+		$("#backBtn3").hide();
 		$(".secondStep").hide();
 		$(".thirdStep").hide();
 		$("#recordBtn").hide();
 		$("#searchBtn").hide();
 		clearAllRegFormInput();
+		$("#recordBtn").removeAttr("disabled");
+		$("#registerNewBtn").hide();
+		$("#statusPerProcess").text("");
 	};
 
 	var getUserRegFormInput = function(){
@@ -184,21 +235,23 @@ $(document).ready(function(){
 			bdayYear: 			$("#bdayYear").val(),
 			////////////////////////////////////////////////
 			inputFatherName: 	$("#inputFatherName").val(),
-			inputFatherBirthPlace: $("#inputFatherBirthPlace").val(),
+			//inputFatherBirthPlace: $("#inputFatherBirthPlace").val(),
 			inputMotherName: 	$("#inputMotherName").val(),
-			inputMotherBirthPlace: $("#inputGodmotherAddress").val(),
+			//inputMotherBirthPlace: $("#inputGodmotherAddress").val(),
 			inputEmailAddress: 	$("#inputEmailAddress").val(),
 			inputHomeAddress: 	$("#inputHomeAddress").val(),
 			///////////////////////////////////////////////
 			inputMinisterName: 	$("#inputMinisterName").val(),
+			inputGodfatherName: $("#inputGodfatherName").val(),
+			//inputGodfatherAddress: $("#inputGodfatherAddress").val(),
+			inputGodmotherName: $("#inputGodmotherName").val(),
+			//inputGodmotherAddress: $("#inputGodmotherAddress").val(),
 			baptismMonth: 		$("#baptismMonth").val(),
 			baptismDay: 		$("#baptismDay").val(),
 			baptismYear: 		$("#baptismYear").val(),
-			baptismYear: 		$("#baptismYear").val(),
-			inputGodfatherName: $("#inputGodfatherName").val(),
-			inputGodfatherAddress: $("#inputGodfatherAddress").val(),
-			inputGodmotherName: $("#inputGodmotherName").val(),
-			inputGodmotherAddress: $("#inputGodmotherAddress").val()
+			inputBaptismRegNum: $("#inputBaptismRegNum").val(),
+			inputBaptismPageNum: $("#inputBaptismPageNum").val(),
+			inputBaptismBookNum: $("#inputBaptismBookNum").val()
 		};
 	};
 
@@ -220,5 +273,9 @@ $(document).ready(function(){
 		resetRegForm();
 		userFormInput = {};
 		$("#searchResults").remove();
+	});
+
+	$('#myModal').on('shown.bs.modal', function (e) {
+		$("#inputLastName").focus();
 	});
 });

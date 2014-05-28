@@ -13,18 +13,21 @@
     $emailAddress = $_POST['inputEmailAddress'];
     $homeAddress = $_POST['inputHomeAddress'];
     $ministerName = $_POST['inputMinisterName'];
+    $godFatherName = $_POST['inputGodfatherName'];
+    $godMotherName = $_POST['inputGodmotherName'];
     $baptismMonth = $_POST['baptismMonth'];
     $baptismDay = $_POST['baptismDay'];
     $baptismYear = $_POST['baptismYear'];
-
-    
+    $baptismRegNum = $_POST['inputBaptismRegNum'];
+    $baptismPageNum = $_POST['inputBaptismPageNum'];
+    $baptismBookNum = $_POST['inputBaptismBookNum'];
  
     date_default_timezone_set("Asia/Manila");
     $dateAdded = date("Y/m/d");
     $timeAdded = date("H:i:s");
 
-    $newRecordChristian = mysqli_query($con, "INSERT INTO christians (childLName, childFName, childMName, bdayMonth, bdayDay, bdayYear) VALUES ('$childLName', '$childFName', '$childMName', '$bdayMonth', '$bdayDay', '$bdayYear')");
-    $newRecordDetails = mysqli_query($con, "INSERT INTO details (fatherName, motherName, emailAddress, homeAddress, ministerName, baptismMonth, baptismDay, baptismYear) VALUES ('$fatherName', '$motherName', '$emailAddress', '$homeAddress', '$ministerName', '$baptismMonth', '$baptismDay', '$baptismYear')");
+    $newRecordChristian = mysqli_query($con, "INSERT INTO christians (childLName, childFName, childMName, bdayMonth, bdayDay, bdayYear, encodingDate, encodingTime) VALUES ('$childLName', '$childFName', '$childMName', '$bdayMonth', '$bdayDay', '$bdayYear', '$dateAdded', '$timeAdded')");
+    $newRecordDetails = mysqli_query($con, "INSERT INTO details (fatherName, motherName, emailAddress, homeAddress, ministerName, baptismMonth, baptismDay, baptismYear, baptismRegNum, baptismPageNum, baptismBookNum) VALUES ('$fatherName', '$motherName', '$emailAddress', '$homeAddress', '$ministerName', '$baptismMonth', '$baptismDay', '$baptismYear', '$baptismRegNum', '$baptismPageNum', '$baptismBookNum')");
 
     $newRecordJson = array();
     $newRecordJson['queryStatus'] = "fail";
