@@ -10,7 +10,9 @@ $(document).ready(function(){
 	$("#recordBtn").hide();
 	$("#searchBtn").hide();
 	$("#registerNewBtn").hide();
+	$(".searchPanel").hide();
 
+	//////////////////////////////REGISTRATION///////////////////////////////////
 
 	$("#nextBtn1").click(function(){
 		if($("#inputLastName").val() != "" && $("#inputFirstName").val() != "" && $("#bdayMonth").val() != "" && $("#bdayDay").val() != "" && $("#bdayYear").val() != ""){
@@ -79,9 +81,10 @@ $(document).ready(function(){
 		if($("#inputMinisterName").val() != "" && $("#inputGodfatherName").val() != "" && $("#inputGodmotherName").val() != "" && $("#baptismMonth").val() != "" && $("#baptismDay").val() != "" && $("#baptismYear").val() != "" && $("#inputBaptismRegNum").val() != "" && $("#inputBaptismPageNum").val() != "" && $("#inputBaptismBookNum").val() != ""){
 			getUserRegFormInput();
 			$("#recordBtn").attr("disabled","disabled");
-			$.post("php/insertNewRecord.php", userFormInput, function(json){
+			$.post("php/insertNewRecord.php", userFormInput, function(json, status){
+				console.log(status);
 				console.log(json);
-				if(json.queryStatus == "success"){
+				if(json.queryStatus == "success" && status != "success"){
 					$("#registerNewBtn").show();
 					$("#recordBtn").hide();
 					$("#statusPerProcess").text("Successfully Recorded: " + json.childLName  + ", " + json.childFName + " " + json.childMName);
@@ -108,18 +111,21 @@ $(document).ready(function(){
 		resetRegForm();
 	});
 
+	////////////////////////////////SEARCH///////////////////////////////////
+
 	$("#searchRecord").click(function(){
 		$("#myModalLabel").text("Search Records");
-		$("#nextBtn").hide();
+		$("#nextBtn1").hide();
+		$(".searchPanel").show();
 		$("#searchBtn").show();
-		$(".firstStep").show();
+		$(".firstStep").hide();
 	});
 
 	$("#searchBtn").click(function(){
 		getUserSearchFormInput();
 		
 		$("#searchResults").remove();
-		$.post("php/searchRecord.php", userFormInput, function(json){
+		$.post("php/searchEngine.php", {search_term: $("#searchBar").val()}, function(json){
 			console.log(json);
 			if(json.queryStatus == "success"){
 				$(".firstStep").hide();
@@ -218,11 +224,12 @@ $(document).ready(function(){
 		$(".secondStep").hide();
 		$(".thirdStep").hide();
 		$("#recordBtn").hide();
-		$("#searchBtn").hide();
 		clearAllRegFormInput();
 		$("#recordBtn").removeAttr("disabled");
 		$("#registerNewBtn").hide();
 		$("#statusPerProcess").text("");
+		$(".searchPanel").hide();
+		$("#searchBtn").hide();
 	};
 
 	var getUserRegFormInput = function(){
@@ -252,17 +259,6 @@ $(document).ready(function(){
 			inputBaptismRegNum: $("#inputBaptismRegNum").val(),
 			inputBaptismPageNum: $("#inputBaptismPageNum").val(),
 			inputBaptismBookNum: $("#inputBaptismBookNum").val()
-		};
-	};
-
-	var getUserSearchFormInput = function(){
-		userFormInput = {
-			inputLastName: 		$("#inputLastName").val(),
-			inputFirstName: 	$("#inputFirstName").val(),
-			inputMiddleName: 	$("#inputMiddleName").val(),
-			bdayMonth: 			$("#bdayMonth").val(),
-			bdayDay: 			$("#bdayDay").val(),
-			bdayYear: 			$("#bdayYear").val()
 		};
 	};
 
