@@ -21,6 +21,7 @@
     $baptismRegNum = $_POST['inputBaptismRegNum'];
     $baptismPageNum = $_POST['inputBaptismPageNum'];
     $baptismBookNum = $_POST['inputBaptismBookNum'];
+   
  
     date_default_timezone_set("Asia/Manila");
     $dateAdded = date("Y/m/d");

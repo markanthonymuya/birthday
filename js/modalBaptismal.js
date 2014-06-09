@@ -8,6 +8,7 @@ $(document).ready(function(){
 	$("#backBtn3").hide();
 	$("#nextBtn2").hide();
 	$("#recordBtn").hide();
+	$("#updateBtn").hide();
 	$("#searchBtn").hide();
 	$("#registerNewBtn").hide();
 	$(".searchPanel").hide();
@@ -131,8 +132,9 @@ $(document).ready(function(){
 				$("#modalBody").prepend('<div id="searchResults"></div>');
 				for(var i = 1; i <= json.counter; i++){
 					var jsonIdNumber = json['christianId'+i];
+					console.log(jsonIdNumber);
 					var stringSettings = '<button id="deleteBtn'+i+'" userId="'+jsonIdNumber+'" data-rf="'+i+'" class="btn btn-default pull-right deleteBtn" style="margin-left: 5px;"><span class="glyphicon glyphicon-remove"></span></button><button id="editBtn'+i+'" userId="'+jsonIdNumber+'" class="btn btn-default pull-right editBtn"><span class="glyphicon glyphicon-pencil"></span></button></span>';
-					$("#searchResults").append('<p class="appendedSearch" id="appended'+i+'"><span data-rf="'+i+'" id="resultChristian'+i+'">'+json['childLName'+jsonIdNumber]+', '+json['childFName'+jsonIdNumber]+' '+json['childMName'+jsonIdNumber]+'<button id="confirmedDeleteBtn'+i+'" style="margin-left: 5px;" class="btn btn-danger pull-right confirmedDeleteBtn">Delete</button>'+stringSettings+'</p><br class="resultBreak" />');
+					$("#searchResults").append('<p class="appendedSearch"  id="appended'+i+'"><span data-rf="'+i+'" id="resultChristian'+i+'">'+json['childLName'+i]+', '+json['childFName'+i]+' '+json['childMName'+i]+'<button id="confirmedDeleteBtn'+i+'" userId="'+jsonIdNumber+'" data-rf="'+i+'" style="margin-left: 5px;" class="btn btn-danger pull-right confirmedDeleteBtn">Delete</button>'+stringSettings+'</p><br class="resultBreak" />');
 					$("#confirmedDeleteBtn"+i).hide();
 				}
 
@@ -145,13 +147,13 @@ $(document).ready(function(){
 				});
 
 				$(".confirmedDeleteBtn").click(function(){
-					var parentId = this.parentNode.getAttribute('data-rf');
+					var parentId = this.parentNode.getAttribute('userId');
 					$(".confirmedDeleteBtn").hide();
 					$(".deleteBtn").show();
 					$("#confirmedDeleteBtn"+parentId).show();
 					$("#deleteBtn"+parentId).hide();
 
-					var jsonIdNumber = this.parentNode.getAttribute('userId');
+					var jsonIdNumber = this.parentNode.getAttribute('data-rf');
 
 					var deleteFromDB = 	{
 											inputLastName: json['childLName'+jsonIdNumber],
@@ -159,14 +161,15 @@ $(document).ready(function(){
 											inputMiddleName: json['childMName'+jsonIdNumber],
 											bdayMonth: json['bdayMonth'+jsonIdNumber],
 											bdayDay: json['bdayDay'+jsonIdNumber],
-											bdayYear: json['bdayYear'+jsonIdNumber]
+											bdayYear: json['bdayYear'+jsonIdNumber],
+											searchableText: json['text'+jsonIdNumber]
 										};
-					console.log(deleteFromDB);
+					
 					$.post("php/deleteRecord.php", deleteFromDB, function(json){
 						console.log(json);
 						if(json.queryStatus == "success"){
 							alert("Successfully Deleted: " + json.childLName  + ", " + json.childFName + " " + json.childMName);
-							$("#appended" + parentId).remove();
+							$("#appended" + jsonIdNumber).remove();
 						}
 						else{
 							alert("Failed to Delete Record. Please try again later.");
@@ -175,9 +178,48 @@ $(document).ready(function(){
 					console.log("confirmedDeleteBtn");		
 				});
 
+				$(".editBtn").click(function(){
+					resetRegForm();
+
+					var jsonIdNumber = this.parentNode.getAttribute('data-rf');
+					var editFromDB = 	{
+											inputLastName: json['childLName'+jsonIdNumber],
+											inputFirstName: json['childFName'+jsonIdNumber],
+											inputMiddleName: json['childMName'+jsonIdNumber],
+											bdayMonth: json['bdayMonth'+jsonIdNumber],
+											bdayDay: json['bdayDay'+jsonIdNumber],
+											bdayYear: json['bdayYear'+jsonIdNumber],
+											searchableText: json['text'+jsonIdNumber]
+										};
+
+					$("#inputLastName").val(editFromDB.inputLastName);
+					$("#inputFirstName").val(editFromDB.inputFirstName);
+					$("#inputMiddleName").val(editFromDB.inputMiddleName);
+					$("#bdayMonth").val(editFromDB.bdayMonth);
+					$("#bdayDay").val(editFromDB.bdayDay);
+					$("#bdayYear").val(editFromDB.bdayYear);
+					//////////////////////////////////
+					
+					console.log(editFromDB);
+					$.post("php/editRecord.php", editFromDB, function(json){
+						console.log(json);
+						if(json.queryStatus == "success" && status == "success"){
+							$("#updateBtn").hide();
+							$("#statusPerProcess").text("Successfully Edited: " + json.childLName  + ", " + json.childFName + " " + json.childMName);
+							$("#statusPerProcess").attr("style", "color:green");
+							$("#backBtn3").hide();
+						}
+						else{
+							alert("Failed to edit record. Please try again later.");
+							$("updateBtn").removeAttr("disabled");
+						}
+					});	
+				});
+
 			}
 			else{
-				alert("Failed to Search A Record. Please try again later.");
+				$("#modalBody").prepend('<div id="searchResults"></div>');
+				$("#searchResults").append('<center><p class="appendedSearch">No Results</p></center><br class="resultBreak" />');
 			}
 		});
 	});
@@ -223,12 +265,15 @@ $(document).ready(function(){
 		$(".secondStep").hide();
 		$(".thirdStep").hide();
 		$("#recordBtn").hide();
+		$("#updateBtn").hide();
 		clearAllRegFormInput();
 		$("#recordBtn").removeAttr("disabled");
+		$("#updateBtn").removeAttr("disabled");
 		$("#registerNewBtn").hide();
 		$("#statusPerProcess").text("");
 		$(".searchPanel").hide();
 		$("#searchBtn").hide();
+		$("#searchResults").remove();
 	};
 
 	var getUserRegFormInput = function(){
@@ -267,7 +312,6 @@ $(document).ready(function(){
 	$('#myModal').on('hidden.bs.modal', function (e) {
 		resetRegForm();
 		userFormInput = {};
-		$("#searchResults").remove();
 	});
 
 	$('#myModal').on('shown.bs.modal', function (e) {
