@@ -183,8 +183,15 @@ $(document).ready(function(){
 
 					var jsonIdNumber = this.parentNode.getAttribute('data-rf');
 					var editFromDB = 	{
+											inputLastName: json['childLName'+jsonIdNumber],
+											inputFirstName: json['childFName'+jsonIdNumber],
+											inputMiddleName: json['childMName'+jsonIdNumber],
+											bdayMonth: json['bdayMonth'+jsonIdNumber],
+											bdayDay: json['bdayDay'+jsonIdNumber],
+											bdayYear: json['bdayYear'+jsonIdNumber],
 											searchableText: json['text'+jsonIdNumber]
 										};
+										console.log(editFromDB);
 
 					$("#inputLastName").val(editFromDB.inputLastName);
 					$("#inputFirstName").val(editFromDB.inputFirstName);
