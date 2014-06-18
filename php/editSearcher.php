@@ -8,22 +8,11 @@
     $bdayDay = $_POST['bdayDay'];
     $bdayYear = $_POST['bdayYear'];
 
-    // $childLName = $_GET['inputLastName'];
-    // $childFName = $_GET['inputFirstName'];
-    // $childMName = $_GET['inputMiddleName'];
-    // $bdayMonth = $_GET['bdayMonth'];
-    // $bdayDay = $_GET['bdayDay'];
-    // $bdayYear = $_GET['bdayYear'];
-
     $searchRecordJson = array();
     $searchRecordJson['queryStatus'] = "fail";
 
-    $queryId = mysqli_query($con, "SELECT * FROM christians WHERE childLName='$childLName' OR childFName='$childFName' OR childMName='$childMName' OR bdayMonth='$bdayMonth' OR bdayDay='$bdayDay' OR bdayYear='$bdayYear'");
+    $queryId = mysqli_query($con, "SELECT christianId FROM christians WHERE childLName='$childLName' AND childFName='$childFName' AND childMName='$childMName' AND bdayMonth='$bdayMonth' AND bdayDay='$bdayDay' AND bdayYear='$bdayYear'");
     
-    if($queryId){
-        $searchRecordJson['queryStatus'] = "success";
-        if(mysqli_num_rows($queryId) > 0){
-            $counter = 1;
             while($row = mysqli_fetch_array($queryId)){
                 $idNumber = $row['id'];
                 $searchRecordJson['idNumber'.$counter] = $row['id'];

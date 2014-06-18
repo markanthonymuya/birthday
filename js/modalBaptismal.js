@@ -87,6 +87,7 @@ $(document).ready(function(){
 				console.log(json);
 				if(json.queryStatus == "success" && status == "success"){
 					$("#registerNewBtn").show();
+					$("#registerNewBtn").focus();
 					$("#recordBtn").hide();
 					$("#statusPerProcess").text("Successfully Recorded: " + json.childLName  + ", " + json.childFName + " " + json.childMName);
 					$("#statusPerProcess").attr("style", "color:green");
@@ -110,6 +111,7 @@ $(document).ready(function(){
 
 	$("#registerNewBtn").click(function(){
 		resetRegForm();
+		$("#inputFirstName").focus();
 	});
 
 	////////////////////////////////SEARCH///////////////////////////////////
@@ -131,10 +133,11 @@ $(document).ready(function(){
 				$(".firstStep").hide();
 				$("#modalBody").prepend('<div id="searchResults"></div>');
 				for(var i = 1; i <= json.counter; i++){
-					var jsonIdNumber = json['christianId'+i];
-					console.log(jsonIdNumber);
-					var stringSettings = '<button id="deleteBtn'+i+'" userId="'+jsonIdNumber+'" data-rf="'+i+'" class="btn btn-default pull-right deleteBtn" style="margin-left: 5px;"><span class="glyphicon glyphicon-remove"></span></button><button id="editBtn'+i+'" userId="'+jsonIdNumber+'" class="btn btn-default pull-right editBtn"><span class="glyphicon glyphicon-pencil"></span></button></span>';
-					$("#searchResults").append('<p class="appendedSearch"  id="appended'+i+'"><span data-rf="'+i+'" id="resultChristian'+i+'">'+json['childLName'+i]+', '+json['childFName'+i]+' '+json['childMName'+i]+'<button id="confirmedDeleteBtn'+i+'" userId="'+jsonIdNumber+'" data-rf="'+i+'" style="margin-left: 5px;" class="btn btn-danger pull-right confirmedDeleteBtn">Delete</button>'+stringSettings+'</p><br class="resultBreak" />');
+					var christianIdNumber = json['christianId'+i];
+					// console.log("ChristianId");
+					// console.log(christianIdNumber);
+					var stringSettings = '<button id="deleteBtn'+i+'" userId="'+christianIdNumber+'" data-rf="'+i+'" class="btn btn-default pull-right deleteBtn" style="margin-left: 5px;"><span class="glyphicon glyphicon-remove"></span></button><button id="editBtn'+i+'" userId="'+christianIdNumber+'" class="btn btn-default pull-right editBtn"><span class="glyphicon glyphicon-pencil"></span></button></span>';
+					$("#searchResults").append('<p class="appendedSearch"  id="appended'+i+'"><span data-rf="'+i+'" id="resultChristian'+i+'">'+json['childLName'+i]+', '+json['childFName'+i]+' '+json['childMName'+i]+'<button id="confirmedDeleteBtn'+i+'" userId="'+christianIdNumber+'" data-rf="'+i+'" style="margin-left: 5px;" class="btn btn-danger pull-right confirmedDeleteBtn">Delete</button>'+stringSettings+'</p><br class="resultBreak" />');
 					$("#confirmedDeleteBtn"+i).hide();
 				}
 
@@ -147,51 +150,58 @@ $(document).ready(function(){
 				});
 
 				$(".confirmedDeleteBtn").click(function(){
-					var parentId = this.parentNode.getAttribute('userId');
-					$(".confirmedDeleteBtn").hide();
-					$(".deleteBtn").show();
-					$("#confirmedDeleteBtn"+parentId).show();
-					$("#deleteBtn"+parentId).hide();
-
-					var jsonIdNumber = this.parentNode.getAttribute('data-rf');
-
-					var deleteFromDB = 	{
-											inputLastName: json['childLName'+jsonIdNumber],
-											inputFirstName: json['childFName'+jsonIdNumber],
-											inputMiddleName: json['childMName'+jsonIdNumber],
-											bdayMonth: json['bdayMonth'+jsonIdNumber],
-											bdayDay: json['bdayDay'+jsonIdNumber],
-											bdayYear: json['bdayYear'+jsonIdNumber],
-											searchableText: json['text'+jsonIdNumber]
-										};
+					var parentId = this.parentNode.getAttribute('data-rf');
 					
-					$.post("php/deleteRecord.php", deleteFromDB, function(json){
-						console.log(json);
-						if(json.queryStatus == "success"){
-							alert("Successfully Deleted: " + json.childLName  + ", " + json.childFName + " " + json.childMName);
-							$("#appended" + jsonIdNumber).remove();
-						}
-						else{
-							alert("Failed to Delete Record. Please try again later.");
-						}
-					});
-					console.log("confirmedDeleteBtn");		
+					var confirmedPopUp = confirm("Do you really want to delete " + json['childLName'+parentId] + ", " + json['childFName'+parentId] + " " + json['childMName'+parentId] + " records?");
+
+					if(confirmedPopUp){
+						
+						var deleteFromDB = 	{
+												inputLastName: json['childLName'+parentId],
+												inputFirstName: json['childFName'+parentId],
+												inputMiddleName: json['childMName'+parentId],
+												bdayMonth: json['bdayMonth'+parentId],
+												bdayDay: json['bdayDay'+parentId],
+												bdayYear: json['bdayYear'+parentId],
+												searchableText: json['text'+parentId]
+											};
+						
+						$.post("php/deleteRecord.php", deleteFromDB, function(json){
+							console.log(json);
+							if(json.queryStatus == "success"){
+								$("#statusPerProcess").text("Successfully Deleted: " + json.childLName  + ", " + json.childFName + " " + json.childMName);
+								$("#statusPerProcess").attr("style", "color:green");
+								$("#statusPerProcess").show("slow");
+								$("#appended" + parentId).remove();
+							}
+							else{
+								alert("Failed to Delete Record. Please try again later.");
+							}
+						});
+						console.log("confirmedDeleteBtn");
+						console.log(json['christianId'+parentId]);
+					}
+					else{
+						$(".confirmedDeleteBtn").hide();
+						$(".deleteBtn").show();
+					}	
 				});
 
 				$(".editBtn").click(function(){
 					resetRegForm();
 
-					var jsonIdNumber = this.parentNode.getAttribute('data-rf');
+					var parentId = this.parentNode.getAttribute('data-rf');
 					var editFromDB = 	{
-											inputLastName: json['childLName'+jsonIdNumber],
-											inputFirstName: json['childFName'+jsonIdNumber],
-											inputMiddleName: json['childMName'+jsonIdNumber],
-											bdayMonth: json['bdayMonth'+jsonIdNumber],
-											bdayDay: json['bdayDay'+jsonIdNumber],
-											bdayYear: json['bdayYear'+jsonIdNumber],
-											searchableText: json['text'+jsonIdNumber]
+											inputLastName: json['childLName'+parentId],
+											inputFirstName: json['childFName'+parentId],
+											inputMiddleName: json['childMName'+parentId],
+											bdayMonth: json['bdayMonth'+parentId],
+											bdayDay: json['bdayDay'+parentId],
+											bdayYear: json['bdayYear'+parentId],
+											searchableText: json['text'+parentId]
 										};
-										console.log(editFromDB);
+					
+					console.log(editFromDB);
 
 					$("#inputLastName").val(editFromDB.inputLastName);
 					$("#inputFirstName").val(editFromDB.inputFirstName);
@@ -202,7 +212,7 @@ $(document).ready(function(){
 					//////////////////////////////////
 					
 					console.log(editFromDB);
-					$.post("php/editRecord.php", editFromDB, function(json){
+					$.post("php/editSearcher.php", editFromDB, function(json){
 						console.log(json);
 						if(json.queryStatus == "success" && status == "success"){
 							$("#updateBtn").hide();
@@ -316,6 +326,6 @@ $(document).ready(function(){
 	});
 
 	$('#myModal').on('shown.bs.modal', function (e) {
-		$("#inputLastName").focus();
+		$("#inputFirstName").focus();
 	});
 });
