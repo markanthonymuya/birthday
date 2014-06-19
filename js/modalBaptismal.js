@@ -1,6 +1,7 @@
 $(document).ready(function(){
 
 	var userFormInput = {};
+	var updateBtn = false;
 
 	$(".secondStep").hide();
 	$(".thirdStep").hide();
@@ -44,7 +45,12 @@ $(document).ready(function(){
 			$("#backBtn3").show();
 			$(".secondStep").hide();
 			$(".thirdStep").show();
-			$("#recordBtn").show();
+			if(updateBtn){
+				$("#updateBtn").show();
+			}
+			else{
+				$("#recordBtn").show();
+			}
 			$("#inputMinisterName").focus();
 			$("#inputMinisterName").val("Rev. Fr. ");
 		}
@@ -190,43 +196,57 @@ $(document).ready(function(){
 				$(".editBtn").click(function(){
 					resetRegForm();
 
-					var parentId = this.parentNode.getAttribute('data-rf');
-					var editFromDB = 	{
-											inputLastName: json['childLName'+parentId],
-											inputFirstName: json['childFName'+parentId],
-											inputMiddleName: json['childMName'+parentId],
-											bdayMonth: json['bdayMonth'+parentId],
-											bdayDay: json['bdayDay'+parentId],
-											bdayYear: json['bdayYear'+parentId],
-											searchableText: json['text'+parentId]
-										};
-					
-					console.log(editFromDB);
+					updateBtn = true;
 
-					$("#inputLastName").val(editFromDB.inputLastName);
-					$("#inputFirstName").val(editFromDB.inputFirstName);
-					$("#inputMiddleName").val(editFromDB.inputMiddleName);
-					$("#bdayMonth").val(editFromDB.bdayMonth);
-					$("#bdayDay").val(editFromDB.bdayDay);
-					$("#bdayYear").val(editFromDB.bdayYear);
-					//////////////////////////////////
+					var parentId = this.parentNode.getAttribute('data-rf');
+												
+					$("#inputLastName").val(json['childLName'+parentId]);
+					$("#inputFirstName").val(json['childFName'+parentId]);
+					$("#inputMiddleName").val(json['childMName'+parentId]);
+					$("#bdayMonth").val(json['bdayMonth'+parentId]);
+					$("#bdayDay").val(json['bdayDay'+parentId]);
+					$("#bdayYear").val(json['bdayYear'+parentId]);
 					
-					console.log(editFromDB);
-					$.post("php/editSearcher.php", editFromDB, function(json){
-						console.log(json);
-						if(json.queryStatus == "success" && status == "success"){
-							$("#updateBtn").hide();
-							$("#statusPerProcess").text("Successfully Edited: " + json.childLName  + ", " + json.childFName + " " + json.childMName);
-							$("#statusPerProcess").attr("style", "color:green");
-							$("#backBtn3").hide();
-						}
-						else{
-							alert("Failed to edit record. Please try again later.");
-							$("updateBtn").removeAttr("disabled");
+					$.post("php/editSearcher.php", {christianId: json['christianId'+parentId]}, function(jsonEditSearcher){
+						if(jsonEditSearcher.queryStatus == "success"){
+							console.log(jsonEditSearcher);
+							$("#inputFatherName").val(jsonEditSearcher.fatherName);
+							$("#inputMotherName").val(jsonEditSearcher.motherName);
+							$("#inputEmailAddress").val(jsonEditSearcher.emailAddress);
+							$("#inputHomeAddress").val(jsonEditSearcher.homeAddress);
+							$("#inputMinisterName").val(jsonEditSearcher.ministerName);
+							$("#inputGodfatherName").val(jsonEditSearcher.godFatherName);
+							$("#inputGodmotherName").val(jsonEditSearcher.godMotherName);
+							$("#baptismMonth").val(jsonEditSearcher.baptismMonth);
+							$("#baptismDay").val(jsonEditSearcher.baptismDay);
+							$("#baptismYear").val(jsonEditSearcher.baptismYear);
+							$("#inputBaptismRegNum").val(jsonEditSearcher.baptismRegNum);
+							$("#inputBaptismPageNum").val(jsonEditSearcher.baptismPageNum);
+							$("#inputBaptismBookNum").val(jsonEditSearcher.baptismBookNum);
 						}
 					});	
 				});
-
+			
+				$("#updateBtn").click(function(){
+					$("#updateBtn").attr("disabled","disabled");
+					getUserRegFormInput();
+					$.post("php/editUpdater.php", userFormInput, function(json, status){
+						console.log(status);
+						console.log(json);
+						if(json.queryStatus == "success" && status == "success"){
+							$("#updateBtn").hide();
+							$("#statusPerProcess").text("Successfully Recorded: " + json.childLName  + ", " + json.childFName + " " + json.childMName);
+							$("#statusPerProcess").attr("style", "color:green");
+							$("#backBtn3").hide();
+							$("#searchBtn").hide();
+							$(".searchPanel").hide();
+						}
+						else{
+							alert("Failed to Update A Record. Please try again later.");
+							$("#updateBtn").removeAttr("disabled");
+						}
+					});
+				});
 			}
 			else{
 				$("#modalBody").prepend('<div id="searchResults"></div>');
@@ -317,12 +337,24 @@ $(document).ready(function(){
 		};
 	};
 
+	var searchRecordsPane = function(){
+		$("#myModalLabel").text("Search Records");
+		$("#nextBtn1").hide();
+		$(".firstStep").hide();
+		$("#backBtn3").hide();
+		$(".thirdStep").hide();
+		$("#updateBtn").hide();
+		$(".searchPanel").show();
+		$("#searchBtn").show();
+	};
+
 
 	////////////MODAL EVENTS//////////////
 
 	$('#myModal').on('hidden.bs.modal', function (e) {
 		resetRegForm();
 		userFormInput = {};
+		updateBtn = false;
 	});
 
 	$('#myModal').on('shown.bs.modal', function (e) {

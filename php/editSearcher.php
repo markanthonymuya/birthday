@@ -1,42 +1,43 @@
 <?php
     require('../key/access.php');
 
-    $childLName = $_POST['inputLastName'];
-    $childFName = $_POST['inputFirstName'];
-    $childMName = $_POST['inputMiddleName'];
-    $bdayMonth = $_POST['bdayMonth'];
-    $bdayDay = $_POST['bdayDay'];
-    $bdayYear = $_POST['bdayYear'];
+    $christianId = $_POST['christianId'];
 
     $searchRecordJson = array();
     $searchRecordJson['queryStatus'] = "fail";
 
-    $queryId = mysqli_query($con, "SELECT christianId FROM christians WHERE childLName='$childLName' AND childFName='$childFName' AND childMName='$childMName' AND bdayMonth='$bdayMonth' AND bdayDay='$bdayDay' AND bdayYear='$bdayYear'");
+    $queryDetails = mysqli_query($con, "SELECT * FROM details WHERE christianId='$christianId'");
     
-            while($row = mysqli_fetch_array($queryId)){
-                $idNumber = $row['id'];
-                $searchRecordJson['idNumber'.$counter] = $row['id'];
-                $searchRecordJson['childLName'.$idNumber] = $row['childLName'];
-                $searchRecordJson['childFName'.$idNumber] = $row['childFName'];
-                $searchRecordJson['childMName'.$idNumber] = $row['childMName'];
-                $searchRecordJson['bdayMonth'.$idNumber] = $row['bdayMonth'];
-                $searchRecordJson['bdayDay'.$idNumber] = $row['bdayDay'];
-                $searchRecordJson['bdayYear'.$idNumber] = $row['bdayYear'];
-                $searchRecordJson['counter'] = $counter;
-                $counter++;
+            while($row = mysqli_fetch_array($queryDetails)){
+                $searchRecordJson['fatherName'] = $row['fatherName'];
+                $searchRecordJson['motherName'] = $row['motherName'];
+                $searchRecordJson['emailAddress'] = $row['emailAddress'];
+                $searchRecordJson['homeAddress'] = $row['homeAddress'];
+                $searchRecordJson['ministerName'] = $row['ministerName'];
+                $searchRecordJson['baptismMonth'] = $row['baptismMonth'];
+                $searchRecordJson['baptismDay'] = $row['baptismDay'];
+                $searchRecordJson['baptismYear'] = $row['baptismYear'];
+                $searchRecordJson['baptismRegNum'] = $row['baptismRegNum'];
+                $searchRecordJson['baptismPageNum'] = $row['baptismPageNum'];
+                $searchRecordJson['baptismBookNum'] = $row['baptismBookNum'];
             }
-        }
+
+    $queryDetails = mysqli_query($con, "SELECT * FROM sponsors WHERE christianId='$christianId'");
+
+    $godParents = array("godFatherName", "godMotherName");
+        
+    $i = 0;
+    while($row = mysqli_fetch_array($queryDetails)){
+        $searchRecordJson[$godParents[$i]] = $row['sponsorName'];
+        $i++;
     }
 
-    if($deletedRow == 1){
-        $deletedRecordJson['queryStatus'] = "success";
-        $deletedRecordJson['childLName'] = $childLName;
-        $deletedRecordJson['childFName'] = $childFName;
-        $deletedRecordJson['childMName'] = $childMName;
+    if($queryDetails){
+        $searchRecordJson['queryStatus'] = "success";
     }
 
     header("Content-type:application/json");
-    echo json_encode($deletedRecordJson);
+    echo json_encode($searchRecordJson);
 
     mysqli_close($con);
 

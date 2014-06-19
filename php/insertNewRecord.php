@@ -85,10 +85,14 @@
     else{
         $christianQuery = mysqli_query($con, "SELECT * FROM christians WHERE childLName = '$childLName' AND childFName = '$childFName' AND childMName = '$childMName'");
         while($row = mysqli_fetch_array($christianQuery)){
+            $newRecordJson['christianId'] = $row['christianId'];
             $newRecordJson['childLName'] = $row['childLName'];
             $newRecordJson['childFName'] = $row['childFName'];
             $newRecordJson['childMName'] = $row['childMName'];
         }
+        $christianId = $newRecordJson['christianId'];
+        mysqli_query($con, "INSERT INTO sponsors (sponsorName, christianId) VALUES ('$godFatherName', '$christianId')");
+        mysqli_query($con, "INSERT INTO sponsors (sponsorName, christianId) VALUES ('$godMotherName', '$christianId')");
         $newRecordJson['queryStatus'] = "success";         
     }
 
